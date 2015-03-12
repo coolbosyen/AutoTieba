@@ -1,0 +1,6 @@
+打开子页面 screen	
+回到父页面	按ctrl+a   再按d	
+查看所有子页面 screen -ls	
+切换到子页面	screen -r ID号	
+结束子页面   进入子页面后ctrl+c终止任务 ,输入exit退出  出现[screen is terminating]的字样	
+			使用ctrl+a  k退出当前子界面   会问你y还是n  选择y 即可
