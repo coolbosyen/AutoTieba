@@ -3,6 +3,7 @@
 namespace Action;
 
 use Core\Log;
+use Libs\Ocr;
 
 /**
  * 百度基础服务类
@@ -108,27 +109,47 @@ class BaiduAction {
         $post_data['verifycode'] = $this->verifycode;
 
         $ret = $this->http_request("http://passport.baidu.com/v2/api/?login", $post_data, "https://passport.baidu.com/v2/?login&tpl=mn&u=http%3A%2F%2Fwww.baidu.com%2F");
-        if (config('manual') == 1 && strstr($ret, 'captchaservice')) {
+        if (strstr($ret, 'captchaservice')) {
             if (preg_match('/(captchaservice\w{200,})/', $ret, $match)) {
                 $this->codestring = $match[1];
                 $code_ini = VERIFY_PATH . config('code_ini');
-                $this->getImg('https://passport.baidu.com/cgi-bin/genimage?' . $this->codestring, VERIFY_PATH . config('img_name'));
-                Log::log('需要验证码，已将验证码下载，请手动输入验证码到配置文件中' . ENTER);
-                for (;;) {
-                    if (is_file($code_ini))
-                        $verifycode = parse_ini_file($code_ini);
-                    if (isset($verifycode['verifycode']) && $verifycode['verifycode'] && isset($verifycode['status']) && $verifycode['status'] == 1) {
-                        $this->verifycode = $verifycode['verifycode'];
-                        Log::log('已获得验证码：' . $this->verifycode . ENTER);
-                        break;
+                Log::log('需要验证码，即将下载验证码' . ENTER);
+                $img_path = VERIFY_PATH . config('img_name');
+                $img_url = 'https://passport.baidu.com/cgi-bin/genimage?' . $this->codestring;
+                if (config('manual') == 1) {
+                    $this->getImg($img_url, $img_path);
+                    Log::log('当前为手动模式，请手动输入验证码到配置文件中' . ENTER);
+                    for (;;) {
+                        if (is_file($code_ini))
+                            $verifycode = parse_ini_file($code_ini);
+                        if (isset($verifycode['verifycode']) && $verifycode['verifycode'] && isset($verifycode['status']) && $verifycode['status'] == 1) {
+                            $this->verifycode = $verifycode['verifycode'];
+                            Log::log('已获得验证码：' . $this->verifycode . ENTER);
+                            break;
+                        }
+                        sleep(10);
                     }
-                    sleep(10);
+                } else {
+                    Log::log('当前为自动模式，尝试获得验证码' . ENTER);
+                    for (;;) {
+                        $this->getImg($img_url, $img_path);
+                        $verifycode = Ocr::ocr($img_url, realpath($img_path));
+                        Log::log('已识别验证码：' . $verifycode . ENTER);
+                        if (strlen($verifycode) == 4) {
+                            $this->verifycode = $verifycode;
+                            Log::log('格式符合，尝试登陆：' . ENTER);
+                            break;
+                        } else {
+                            Log::log('格式不符，再次识别：' . ENTER);
+                        }
+                    }
                 }
                 $this->login();
             }
         }
         //记录下所有cookie
         $this->writeCookie();
+        Log::save();
     }
 
     /**
