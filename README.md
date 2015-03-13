@@ -39,6 +39,7 @@
         登陆部分参考了www.qaulau.com/php-simulated-login-baidu的代码。
         签到部分参考了部分网络代码。
         验证码识别采用了OcrKing方案。
+        软件采用MIT开源协议发布。
 注意：
 ---
         本软件致力于用于VPS或本机的长期运行的后台脚本。一次运行，长期无忧。
