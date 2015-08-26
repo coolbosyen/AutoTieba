@@ -227,6 +227,8 @@ class OcrKing {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postdata);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //防止假死
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30); //防止假死
         $this->content = curl_exec($ch);
         curl_close($ch);
     }

@@ -41,6 +41,8 @@ class TiebaAction {
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_COOKIE, $this->cookie);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //防止假死
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30); //防止假死
         $get_url = curl_exec($ch);
         curl_close($ch);
         return $get_url;

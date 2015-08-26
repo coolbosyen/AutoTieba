@@ -55,7 +55,8 @@ class BaiduAction {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HEADER, $header);
         curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31");
-
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //防止假死
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30); //防止假死
         if ($this->cookie != "") {
             curl_setopt($ch, CURLOPT_COOKIE, $this->cookie);
         }
@@ -180,6 +181,8 @@ class BaiduAction {
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); //防止假死
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30); //防止假死
         $imageData = curl_exec($curl);
         curl_close($curl);
         $tp = @fopen($filename, 'w');
